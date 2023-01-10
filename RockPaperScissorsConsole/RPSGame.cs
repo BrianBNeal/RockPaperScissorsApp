@@ -22,21 +22,24 @@ public class RPSGame
       (_____)
       (_____)
       (____)
----.__(___)" },
+---.__(___)
+" },
         { RPSOption.Paper, @"
      _______
 ---'    ____)____
            ______)
           _______)
          _______)
----.__________)" },
+---.__________)
+" },
         { RPSOption.Scissors, @"
     _______
 ---'   ____)____
           ______)
        __________)
       (____)
----.__(___)" }
+---.__(___)
+" }
     };
 
     //this is the constructor for this class, this is code that executes when an instance of RPSGame is created with 'new RPSGame()'
@@ -72,13 +75,13 @@ public class RPSGame
     private void DisplayChoices()
     {
         Console.WriteLine();
-        Console.WriteLine($"You picked {Enum.GetName(_currentChoice)}!");
+        Console.WriteLine($" You picked {Enum.GetName(_currentChoice)}!");
 
         _computerChoice = (RPSOption)_picker.Next(1, 4);
         
         Console.WriteLine();
         Pause();
-        Console.Write("...3");
+        Console.Write(" ...3");
         Pause();
         Console.Write("...2");
         Pause();
@@ -87,15 +90,17 @@ public class RPSGame
         Console.WriteLine("...Here we go!!!");
         Pause();
         Console.WriteLine();
-        Console.WriteLine($"{_graphics[_currentChoice]}   VS   {_graphics[_computerChoice]}");
-        Pause(2.4);
+        Console.WriteLine(@$" {_graphics[_currentChoice]}
+      VS
+ {_graphics[_computerChoice]}");
+        Pause(1.5);
     }
 
     /// <summary>
     /// Pauses for the designated period of time to create a better flow
     /// </summary>
     /// <param name="duration">The amount of time in seconds for which you wish to pause.</param>
-    private void Pause(double duration = .8)
+    private void Pause(double duration = .5)
     {
         Task.Delay(TimeSpan.FromSeconds(duration)).Wait();
     }
@@ -150,7 +155,6 @@ public class RPSGame
 
         Console.WriteLine();
         Console.WriteLine(resultText);
-        Console.WriteLine(_sc.ScoreBoard);
     }
 
     /// <summary>
@@ -192,10 +196,10 @@ public class RPSGame
         while (_currentChoice == RPSOption.None)
         {
             Console.Clear();
-            Console.WriteLine(_mainBanner);
+            Console.WriteLine(_sc.ScoreBoard);
             Console.WriteLine(OptionsText());
-            Console.Write("What's your choice? ");
-            string input = Console.ReadKey().KeyChar.ToString(); //I thought a single button press would be nice
+            Console.Write(" What's your choice? ");
+            string input = Console.ReadKey().KeyChar.ToString(); //I thought a single button press would be nice, that's why this is more complex than a ReadLine
             if (int.TryParse(input, out int inputAsInt) && inputAsInt < 4) //I'm checking to make sure a number was pressed, and one less than 4 (the valid values for RPSOption)
             {
                 _currentChoice = (RPSOption)inputAsInt;
@@ -214,7 +218,7 @@ public class RPSGame
         foreach (var option in Enum.GetValues<RPSOption>())
         {
             if (option == 0) { continue; }//this skips the 0 enum option so it won't be in the menu
-            builder.AppendLine($"{(int)option}. {Enum.GetName(option)}");
+            builder.AppendLine($" {(int)option}. {Enum.GetName(option)}");
         }
 
         return builder.ToString();

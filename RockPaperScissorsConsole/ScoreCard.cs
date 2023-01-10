@@ -12,12 +12,9 @@ public class ScoreCard
     }
 
     public string ScoreBoard => $@"
-****************************
-*                          *
-*      Your score is       *
-*          {_wins} - {_losses}           *
-*                          *
-****************************
+ -----------------------------
+ |  Player: {_wins} | Computer: {_losses}  |
+ -----------------------------
 ";
 
     /// <summary>
