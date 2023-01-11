@@ -90,6 +90,7 @@ public class RPSGame
         Console.WriteLine("...Here we go!!!");
         Pause();
         Console.WriteLine();
+        //TODO: display the graphics side by side instead of stacked, gonna require breaking the graphics into lines to insert the VS in the middle
         Console.WriteLine(@$" {_graphics[_currentChoice]}
       VS
  {_graphics[_computerChoice]}");
