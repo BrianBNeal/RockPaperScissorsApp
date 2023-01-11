@@ -11,12 +11,6 @@ public class ScoreCard
         _losses = 0;
     }
 
-    public string ScoreBoard => $@"
- -----------------------------
- |  Player: {_wins} | Computer: {_losses}  |
- -----------------------------
-";
-
     /// <summary>
     /// Updates the score of a game based on the result of the round.
     /// </summary>
@@ -34,5 +28,15 @@ public class ScoreCard
             default:
                 break;
         }
+    }
+
+    public override string ToString()
+    {
+
+        return $@"
+ -----------------------------
+ |  Player: {_wins} | Computer: {_losses}  |
+ -----------------------------
+";
     }
 }

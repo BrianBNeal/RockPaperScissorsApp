@@ -11,8 +11,8 @@ public class RPSGame
     private Random _picker;
     private RPSOption _currentChoice;
     private RPSOption _computerChoice;
-    private readonly string[] _validAffirmatives = new string[] { "y", "yes" };
-    private readonly string[] _validNegatives = new string[] { "n", "no" };
+    private readonly string[] _validAffirmatives = new string[] { "y", "yes", "ok", "okay", "sure", "yep", "fine", "k", "yah" };
+    private readonly string[] _validNegatives = new string[] { "n", "no", "nah", "nope", "negative", "negatory", "hell naw" };
     private readonly Dictionary<RPSOption, string> _graphics = new Dictionary<RPSOption, string>()
     {
         { RPSOption.None, "" },
@@ -116,10 +116,10 @@ public class RPSGame
         Console.WriteLine();
         while (String.IsNullOrWhiteSpace(input) || !ValidYesNoResponse(input))
         {
-            Console.Write("Would you like to play again (y/n)? ");
+            Console.Write("Keep playing? ");
             input = Console.ReadLine();
         }
-
+        
         return _validAffirmatives.Contains(input.ToLower());
     }
 
@@ -196,7 +196,7 @@ public class RPSGame
         while (_currentChoice == RPSOption.None)
         {
             Console.Clear();
-            Console.WriteLine(_sc.ScoreBoard);
+            Console.WriteLine(_sc);
             Console.WriteLine(OptionsText());
             Console.Write(" What's your choice? ");
             string input = Console.ReadKey().KeyChar.ToString(); //I thought a single button press would be nice, that's why this is more complex than a ReadLine
