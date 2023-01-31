@@ -12,6 +12,8 @@ public class RPSGame
     private Random _picker;
     private RPSOption _currentChoice;
     private RPSOption _computerChoice;
+    private readonly string[] _validAffirmatives = new string[] { "y", "yes", "ok", "okay", "sure", "yep", "fine", "k", "yah" };
+    private readonly string[] _validNegatives = new string[] { "n", "no", "nah", "nope", "negative", "negatory", "hell naw" };
     private readonly Dictionary<RPSOption, string> _graphics = new Dictionary<RPSOption, string>()
     {
         { RPSOption.None, "" },
@@ -61,6 +63,7 @@ public class RPSGame
             GetCurrentChoice();
             DisplayChoices();
             ResolveRound();
+            //playing = AskToContinueShort();
             playing = AskToContinue();
         }
 
@@ -139,6 +142,21 @@ public class RPSGame
         Task.Delay(TimeSpan.FromSeconds(duration)).Wait();
     }
 
+    private bool AskToContinueShort()
+    {
+        string? input = "";
+
+        Console.WriteLine();
+
+        while (String.IsNullOrWhiteSpace(input) || (input != "y" && input != "n"))
+        {
+            Console.Write("Keep playing? (y/n)");
+            input = Console.ReadKey(true).KeyChar.ToString().ToLower();
+        }
+
+        return input == "y";
+    }
+
     /// <summary>
     /// Asks for user input and determines if another round should be played.
     /// </summary>
@@ -154,7 +172,7 @@ public class RPSGame
             Console.Write("Keep playing? (y/n)");
             input = Console.ReadKey(true).KeyChar.ToString().ToLower();
         }
-        
+
         return input == "y";
     }
 
