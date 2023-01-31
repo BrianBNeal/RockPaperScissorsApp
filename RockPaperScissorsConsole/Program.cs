@@ -1,4 +1,7 @@
-﻿//there are two versions of Rock Paper Scissors, comment out one and make sure the one you want to play is uncommented.
+﻿//there are two versions of Rock Paper Scissors,
+//comment out one and make sure the one you want to play is uncommented.
+
+
 
 #region RefactoredModularizedApp
 using RockPaperScissorsConsole;

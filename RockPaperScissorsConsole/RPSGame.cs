@@ -1,9 +1,10 @@
-﻿using System.Text;
+﻿using System.Security.Cryptography;
+using System.Text;
 
 namespace RockPaperScissorsConsole;
 
 /// <summary>
-/// A game of Rock, Paper, Scissors. Enjoy!
+/// A game of Rock, Paper, Scissors. Enjoy!  I'm awesome haha
 /// </summary>
 public class RPSGame
 {
@@ -11,38 +12,35 @@ public class RPSGame
     private Random _picker;
     private RPSOption _currentChoice;
     private RPSOption _computerChoice;
-    private readonly string[] _validAffirmatives = new string[] { "y", "yes", "ok", "okay", "sure", "yep", "fine", "k", "yah" };
-    private readonly string[] _validNegatives = new string[] { "n", "no", "nah", "nope", "negative", "negatory", "hell naw" };
     private readonly Dictionary<RPSOption, string> _graphics = new Dictionary<RPSOption, string>()
     {
         { RPSOption.None, "" },
         { RPSOption.Rock, @"
-    _______
----'   ____)
+    _______  
+---'   ____) 
       (_____)
       (_____)
-      (____)
----.__(___)
+      (____) 
+---.__(___)  
 " },
         { RPSOption.Paper, @"
-     _______
----'    ____)____
+     _______      
+---'    ____)____ 
            ______)
           _______)
-         _______)
----.__________)
+         _______) 
+---.__________)   
 " },
         { RPSOption.Scissors, @"
-    _______
----'   ____)____
-          ______)
+    _______       
+---'   ____)____  
+          ______) 
        __________)
-      (____)
----.__(___)
+      (____)      
+---.__(___)       
 " }
     };
-
-    //this is the constructor for this class, this is code that executes when an instance of RPSGame is created with 'new RPSGame()'
+    
     public RPSGame()
     {
         _sc = new ScoreCard();
@@ -89,12 +87,47 @@ public class RPSGame
         Pause();
         Console.WriteLine("...Here we go!!!");
         Pause();
-        Console.WriteLine();
-        //TODO: display the graphics side by side instead of stacked, gonna require breaking the graphics into lines to insert the VS in the middle
-        Console.WriteLine(@$" {_graphics[_currentChoice]}
-      VS
- {_graphics[_computerChoice]}");
+        Console.WriteLine(GetSideBySideGraphic());
+        //TODO: display the graphics side by side instead of stacked,
+        //gonna require breaking the graphics into lines to insert the VS in the middle
+ //       Console.WriteLine(@$" {_graphics[_currentChoice]}
+ //     VS
+ //{_graphics[_computerChoice]}");
         Pause(1.5);
+    }
+
+    /// <summary>
+    /// Puts the graphics side by side to reduce scrolling
+    /// </summary>
+    /// <returns>A string representation of the graphics for this round.</returns>
+    private string GetSideBySideGraphic()
+    {
+        var bldr = new StringBuilder();
+
+        var playerSplit = _graphics[_currentChoice].Split('\n').Skip(1).Take(6).ToList();
+        var compSplit = _graphics[_computerChoice].Split('\n').Skip(1).Take(6).ToList();
+
+        for (int i = 0; i < playerSplit.Count; i++)
+        {
+            var padding = (i == 3) ? "    VS    " : "          ";
+            bldr.AppendLine($"{playerSplit[i].Replace("\r", "")}{padding}{ReverseHand(compSplit[i]).ToString()?.Replace("\r", "")}");
+        }
+
+        return bldr.ToString();
+    }
+    
+    /// <summary>
+    /// Make the hands point towards each other!!!!!!!!!!!
+    /// </summary>
+    /// <param name="value">A string hand graphic that will be reversed left to right</param>
+    /// <returns>A string for your graphics</returns>
+    private string ReverseHand(string value)
+    {
+        char[] charArray = value.ToCharArray();
+        Array.Reverse(charArray);
+        var newResult = new string(charArray);
+        return newResult.Replace("(", "`").Replace(")", "(").Replace("`", ")");
+
     }
 
     /// <summary>
@@ -115,23 +148,14 @@ public class RPSGame
         string? input = "";
 
         Console.WriteLine();
-        while (String.IsNullOrWhiteSpace(input) || !ValidYesNoResponse(input))
+
+        while (String.IsNullOrWhiteSpace(input) || (input != "y" && input != "n"))
         {
-            Console.Write("Keep playing? ");
-            input = Console.ReadLine();
+            Console.Write("Keep playing? (y/n)");
+            input = Console.ReadKey(true).KeyChar.ToString().ToLower();
         }
         
-        return _validAffirmatives.Contains(input.ToLower());
-    }
-
-    /// <summary>
-    /// Validates user input to determine if it is a valid yes/no response.
-    /// </summary>
-    /// <param name="input"></param>
-    /// <returns>True if the input is included in the list of valid responses, false if not included in the list of valid responses.</returns>
-    private bool ValidYesNoResponse(string input)
-    {
-        return _validAffirmatives.Contains(input) || _validNegatives.Contains(input);
+        return input == "y";
     }
 
     /// <summary>
