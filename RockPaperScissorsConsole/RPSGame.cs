@@ -1,10 +1,9 @@
-﻿using System.Security.Cryptography;
-using System.Text;
+﻿using System.Text;
 
 namespace RockPaperScissorsConsole;
 
 /// <summary>
-/// A game of Rock, Paper, Scissors. Enjoy!  I'm awesome haha
+/// A game of Rock, Paper, Scissors. Enjoy!
 /// </summary>
 public class RPSGame
 {
@@ -12,6 +11,7 @@ public class RPSGame
     private Random _picker;
     private RPSOption _currentChoice;
     private RPSOption _computerChoice;
+    private RPSResult _roundResult;
     private readonly string[] _validAffirmatives = new string[] { "y", "yes", "ok", "okay", "sure", "yep", "fine", "k", "yah" };
     private readonly string[] _validNegatives = new string[] { "n", "no", "nah", "nope", "negative", "negatory", "hell naw" };
     private readonly Dictionary<RPSOption, string> _graphics = new Dictionary<RPSOption, string>()
@@ -42,13 +42,14 @@ public class RPSGame
 ---.__(___)       
 " }
     };
-    
+
     public RPSGame()
     {
         _sc = new ScoreCard();
         _picker = new Random();
         _currentChoice = RPSOption.None;
         _computerChoice = RPSOption.None;
+        _roundResult = RPSResult.Draw;
     }
 
     /// <summary>
@@ -63,6 +64,7 @@ public class RPSGame
             GetCurrentChoice();
             DisplayChoices();
             ResolveRound();
+            ShowResult();
             //playing = AskToContinueShort();
             playing = AskToContinue();
         }
@@ -79,7 +81,7 @@ public class RPSGame
         Console.WriteLine($" You picked {Enum.GetName(_currentChoice)}!");
 
         _computerChoice = (RPSOption)_picker.Next(1, 4);
-        
+
         Console.WriteLine();
         Pause();
         Console.Write(" ...3");
@@ -90,13 +92,11 @@ public class RPSGame
         Pause();
         Console.WriteLine("...Here we go!!!");
         Pause();
+        Console.WriteLine();
+        Console.WriteLine();
         Console.WriteLine(GetSideBySideGraphic());
-        //TODO: display the graphics side by side instead of stacked,
-        //gonna require breaking the graphics into lines to insert the VS in the middle
- //       Console.WriteLine(@$" {_graphics[_currentChoice]}
- //     VS
- //{_graphics[_computerChoice]}");
-        Pause(1.5);
+        //Console.WriteLine(@$" {_graphics[_currentChoice]}  VS  {_graphics[_computerChoice]}");
+        Pause(1.2);
     }
 
     /// <summary>
@@ -107,18 +107,18 @@ public class RPSGame
     {
         var bldr = new StringBuilder();
 
-        var playerSplit = _graphics[_currentChoice].Split('\n').Skip(1).Take(6).ToList();
-        var compSplit = _graphics[_computerChoice].Split('\n').Skip(1).Take(6).ToList();
+        var playerSplit = _graphics[_currentChoice].Split("\r\n").Skip(1).Take(6).ToList();
+        var compSplit = _graphics[_computerChoice].Split("\r\n").Skip(1).Take(6).ToList();
 
         for (int i = 0; i < playerSplit.Count; i++)
         {
             var padding = (i == 3) ? "    VS    " : "          ";
-            bldr.AppendLine($"{playerSplit[i].Replace("\r", "")}{padding}{ReverseHand(compSplit[i]).ToString()?.Replace("\r", "")}");
+            bldr.AppendLine($"{playerSplit[i]}{padding}{ReverseHand(compSplit[i]).ToString()}");
         }
 
         return bldr.ToString();
     }
-    
+
     /// <summary>
     /// Make the hands point towards each other!!!!!!!!!!!
     /// </summary>
@@ -147,10 +147,10 @@ public class RPSGame
         string? input = "";
 
         Console.WriteLine();
+        Console.Write("Keep playing? (y/n)");
 
         while (String.IsNullOrWhiteSpace(input) || (input != "y" && input != "n"))
         {
-            Console.Write("Keep playing? (y/n)");
             input = Console.ReadKey(true).KeyChar.ToString().ToLower();
         }
 
@@ -166,14 +166,18 @@ public class RPSGame
         string? input = "";
 
         Console.WriteLine();
-
-        while (String.IsNullOrWhiteSpace(input) || (input != "y" && input != "n"))
+        while (!ValidYesNoResponse(input))
         {
-            Console.Write("Keep playing? (y/n)");
-            input = Console.ReadKey(true).KeyChar.ToString().ToLower();
+            Console.Write("Keep playing? ");
+            input = Console.ReadLine()?.Trim().ToLower();
         }
 
-        return input == "y";
+        return _validAffirmatives.Contains(input);
+    }
+
+    private bool ValidYesNoResponse(string input)
+    {
+        return !string.IsNullOrWhiteSpace(input) && (_validAffirmatives.Contains(input) || _validNegatives.Contains(input));
     }
 
     /// <summary>
@@ -185,19 +189,16 @@ public class RPSGame
         Console.WriteLine("Thanks for playing!");
         Console.WriteLine();
         Console.Write("Press any key to end...");
-        Console.ReadKey();
+        Console.ReadKey(true);
     }
 
     /// <summary>
     /// Prints the result of a round along with the score.
     /// </summary>
-    /// <param name="result"></param>
-    private void ShowResult(RPSResult result)
+    private void ShowResult()
     {
-        string resultText = $"It was a {Enum.GetName(result)}!";
-
         Console.WriteLine();
-        Console.WriteLine(resultText);
+        Console.WriteLine($"It was a {Enum.GetName(_roundResult)}!");
     }
 
     /// <summary>
@@ -205,28 +206,27 @@ public class RPSGame
     /// </summary>
     private void ResolveRound()
     {
-        RPSResult roundResult = RPSResult.Draw;
-
         switch (_currentChoice)
         {
             case RPSOption.Rock when _computerChoice == RPSOption.Paper:
             case RPSOption.Paper when _computerChoice == RPSOption.Scissors:
             case RPSOption.Scissors when _computerChoice == RPSOption.Rock:
-                roundResult = RPSResult.Loss;
+                _roundResult = RPSResult.Loss;
                 break;
 
             case RPSOption.Rock when _computerChoice == RPSOption.Scissors:
             case RPSOption.Paper when _computerChoice == RPSOption.Rock:
             case RPSOption.Scissors when _computerChoice == RPSOption.Paper:
-                roundResult = RPSResult.Win;
+                _roundResult = RPSResult.Win;
                 break;
 
             default:
+                _roundResult = RPSResult.Draw;
                 break;
         }
 
-        _sc.RecordResult(roundResult);
-        ShowResult(roundResult);
+        _sc.RecordResult(_roundResult);
+        _currentChoice = RPSOption.None;
     }
 
     /// <summary>
@@ -234,17 +234,17 @@ public class RPSGame
     /// </summary>
     private void GetCurrentChoice()
     {
-        _currentChoice = RPSOption.None;
+        Console.Clear();
+        Console.WriteLine(_sc);
+        Console.WriteLine(OptionsText());
+        Console.Write(" What's your choice? ");
 
         while (_currentChoice == RPSOption.None)
         {
-            Console.Clear();
-            Console.WriteLine(_sc);
-            Console.WriteLine(OptionsText());
-            Console.Write(" What's your choice? ");
-            string input = Console.ReadKey().KeyChar.ToString(); //I thought a single button press would be nice, that's why this is more complex than a ReadLine
+            string input = Console.ReadKey(true).KeyChar.ToString(); //I thought a single button press would be nice, that's why this is more complex than a ReadLine
             if (int.TryParse(input, out int inputAsInt) && inputAsInt < 4) //I'm checking to make sure a number was pressed, and one less than 4 (the valid values for RPSOption)
             {
+                Console.Write(input);
                 _currentChoice = (RPSOption)inputAsInt;
             }
         }
